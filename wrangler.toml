@@ -1,0 +1,8 @@
+name = "activeledger-ai"
+main = "src/worker.ts"
+compatibility_date = "2024-12-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "YOUR_KV_ID"
+preview_id = "YOUR_PREVIEW_KV_ID"
