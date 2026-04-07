@@ -1,75 +1,52 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Lucineer/capitaine/master/docs/capitaine-logo.jpg" alt="Capitaine" width="120">
-</p>
+# ActiveLedger.ai
 
-<h1 align="center">activeledger-ai</h1>
+Run a private portfolio analysis agent. A Cocapn Fleet vessel.
 
-<p align="center">A fork-first agent for personal portfolio tracking and financial analysis.</p>
-
-<p align="center">
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#limitations">Limitations</a> ·
-  <a href="https://github.com/Lucineer/activeledger-ai/issues">Issues</a>
-</p>
+You host this agent 100% on your own Cloudflare account. It makes direct LLM calls with your API key. No third-party servers handle your portfolio data. Open source, MIT license, zero runtime dependencies. Fork-first software.
 
 ---
 
-A repository that is also an agent. You fork it, deploy it on your Cloudflare account, and it runs autonomously for you. It does not share your data or backend with anyone else.
+## Why This Exists
+Most portfolio trackers sell your trading data or lock you into rigid dashboards. This agent was built to be a private, extensible tool that adapts to your strategy, not a platform's. You own every part of it.
 
-### What this is for
-This is built for personal financial tracking. Most finance tools are services that can change, charge more, or shut down. This code runs on your infrastructure, focused on basic ledger tracking and analysis without external product recommendations.
-
-### What makes it different
-1.  **Fork-first** — You deploy your own instance from this repository. Your data stays within your Cloudflare Workers environment.
-2.  **The repo is the agent** — All logic, state management, and memory are defined in the source code you can read and modify.
-3.  **Fleet-native** — It can communicate and verify data with other vessels in the Cocapn fleet using a standard protocol.
-4.  **Low-cost operation** — Designed to fit within Cloudflare Worker's free tier for typical personal use.
+## What Makes This Different
+1.  **Private Execution:** All LLM calls run directly from your Cloudflare Worker with your API key. Your portfolio data never passes through a shared service.
+2.  **Personalized Analysis:** It builds a persistent knowledge graph based on your specific assets, risk rules, and trade history, enabling more relevant pattern recognition over time.
+3.  **Agent Communication:** It can use the Fleet protocol to cross-verify signals with other trusted agents you run, without sharing your actual holdings.
 
 ---
 
 ## Quick Start
+1.  **Fork this repository.** This gives you the full, unmodified codebase to own and modify.
+2.  Deploy to your Cloudflare account:
+    ```bash
+    gh repo fork Lucineer/activeledger-ai --clone
+    cd activeledger-ai
+    npx wrangler secret put DEEPSEEK_API_KEY
+    npx wrangler deploy
+    ```
+3.  Edit the seed prompts in `src/worker.ts` to reflect your portfolio, risk tolerance, and strategies.
 
-```bash
-# Fork and clone the repository
-gh repo fork Lucineer/activeledger-ai --clone
-cd activeledger-ai
+Your agent will be live at your own `.workers.dev` address.
 
-# Set required API keys as secrets
-npx wrangler secret put DEEPSEEK_API_KEY
-
-# Deploy to your Cloudflare account
-npx wrangler deploy
-```
-
-Your agent will be live at the generated `.workers.dev` URL.
+**Demo:** [https://activeledger-ai.casey-digennaro.workers.dev](https://activeledger-ai.casey-digennaro.workers.dev)
 
 ## Features
-
-- **Credential Management** — API keys are stored in Cloudflare Secrets, not in source code.
-- **Multi-Model Support** — Configured to work with DeepSeek, SiliconFlow, and other compatible LLM APIs.
-- **Session Context** — Maintains conversation history within a user session.
-- **Basic PII Filtering** — Includes patterns to redact common sensitive data strings before LLM processing.
-- **Rate Limiting** — Built-in per-IP request limiting for public endpoints.
-- **Fleet Protocol** — Implements standard health checks and can communicate with other fleet vessels.
+- Portfolio-focused knowledge graph preloaded with trading and risk management concepts.
+- Memory system that connects analysis patterns across your sessions using structural similarity.
+- Bring-your-own-key LLM routing: compatible with DeepSeek, SiliconFlow, OpenRouter, and similar providers.
+- Fleet protocol support for trusted, privacy-preserving communication between your agents.
+- Confidence scoring on analytical outputs.
+- Dead-band logic to skip processing when portfolio inputs haven't changed meaningfully.
+- Automated pruning of stale, low-confidence nodes from the knowledge graph.
 
 ## Architecture
+A single Cloudflare Worker. Request state is handled in memory. Long-term pattern data is persisted only to your Cloudflare KV namespace. No external services are required beyond your chosen LLM provider.
 
-A single Cloudflare Worker with modular internal libraries.
-```
-src/worker.ts    # Main request handler and fleet endpoint
-lib/byok.ts      # Manages LLM API calls and routing
-lib/ledger.ts    # Core logic for transaction tracking
-lib/memory.ts    # Handles conversation and context state
-```
-
-## Limitations
-
-This is a tool for personal tracking and analysis. It does not provide certified financial, tax, or investment advice. The built-in PII filtering is a basic pattern match and should not be solely relied upon for regulatory compliance.
+## A Specific Limitation
+The knowledge graph is stored in Cloudflare KV, which has a 1GB limit per namespace and lacks complex querying. Graph traversal is linear, so performance can degrade noticeably beyond a few thousand nodes.
 
 ---
+Superinstance and Lucineer (DiGennaro et al.)
 
-<div align="center">
-  Part of the <a href="https://the-fleet.casey-digennaro.workers.dev">Cocapn Fleet</a> · <a href="https://cocapn.ai">Cocapn</a><br>
-  <sub>Superinstance & Lucineer (DiGennaro et al.)</sub>
-</div>
+<div style="text-align:center;padding:16px;color:#64748b;font-size:.8rem"><a href="https://the-fleet.casey-digennaro.workers.dev" style="color:#64748b">The Fleet</a> &middot; <a href="https://cocapn.ai" style="color:#64748b">Cocapn</a></div>
